@@ -31,7 +31,7 @@ milage_df.set_index("Date", inplace=True)
 milage_df = milage_df.asfreq("D", fill_value=0).reset_index()
 
 
-#Can change this to be made from a dataframe
+#Can change this to be made from a dataframe later
 event_df = pd.DataFrame([
 	{'Date': pd.to_datetime('2019-07-20'), 'Event': 'Augustin in NYC. 100 degree weather'},
 	{'Date': pd.to_datetime('2019-07-21'),'Event': 'Augustin in NYC. 100 degree weather'},
