@@ -31,7 +31,7 @@ else:
 if plotter.shape[0] == 0:
 	st.error('Oh no! We found no data for the supplied date range')
 else:
-	st.write('## Walking from {s} to {e}'.format(s=str(start_date), e=str(end_date)))
+	st.title('Walking from {s} to {e}\n'.format(s=str(start_date), e=str(end_date)))
 	#st.bar_chart(plotter.set_index('Date'), columns= ['Miles', 'Event'])
 	#print(plotter.set_index('Date'))
 	#st.bar_chart(data=miles)
@@ -65,9 +65,31 @@ else:
 	col2.metric(metric, "{v}".format(v=max_value), "{p}% {w} average".format(p=round(delta,1), w=compare_word))
 	col3.metric("Percentile", "{}%".format(round(max_percentile, 1)))
 
+	# Adding maximum event
+
+	event_init = plotter[plotter.Event != 'None'].copy()
+
+	if event_init.shape[0] == 0:
+
+		st.write('No events in selected time range')
+
+	else:
+		st.write('Event summary')
+
+		event = event_init.groupby('Event')[metric].sum().sort_values(ascending=False)
+
+		if metric == 'Steps':
+			event = event.astype(int)
+
+		else:
+			event = event.round(1).astype(str)
+
+
+		event
+
 # Adding overall maximum
 
-st.write('## Overall')
+st.title('Overall')
 
 st.write('Maximum of All Time')
 
@@ -85,6 +107,20 @@ ocol1, ocol2 = st.columns(2)
 
 ocol1.metric("Date", max_o_date)
 ocol2.metric(metric, "{v}".format(v=max_o_value), "{p}% above average".format(p=round(o_delta,1)))
+
+
+o_event = total[total.Event != 'None'].groupby('Event')[metric].sum().sort_values(ascending=False)
+
+
+if metric == 'Steps':
+	o_event = o_event.astype(int)
+
+else:
+	o_event = o_event.round(1).astype(str)
+
+st.write('Event summary')
+
+o_event
 
 
 
