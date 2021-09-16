@@ -39,5 +39,3 @@ else:
 	# Adding maxumimum
 
 	max_value = plotter[metric].max()
-
-	
