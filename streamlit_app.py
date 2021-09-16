@@ -31,7 +31,7 @@ else:
 if plotter.shape[0] == 0:
 	st.error('Oh no! We found no data for the supplied date range')
 else:
-	st.write('## {m} Walked from {s} to {e}'.format(m=metric, s=str(start_date), e=str(end_date)))
+	st.write('## Walking from {s} to {e}'.format(s=str(start_date), e=str(end_date)))
 	#st.bar_chart(plotter.set_index('Date'), columns= ['Miles', 'Event'])
 	#print(plotter.set_index('Date'))
 	#st.bar_chart(data=miles)
@@ -42,9 +42,10 @@ else:
 
 	# Adding maxumimum
 
-	max_value = int(plotter[metric].max())
+	max_value = plotter[metric].max()
+	max_value = int(max_value) if metric == 'Steps' else (round(max_value, 1))
 	max_idx = plotter[metric].idxmax()
-	print(max_idx)
+	#print(max_idx)
 	max_date =  plotter.Date.loc[max_idx]
 
 	avg = total[metric].mean()
@@ -64,5 +65,26 @@ else:
 	col2.metric(metric, "{v}".format(v=max_value), "{p}% {w} average".format(p=round(delta,1), w=compare_word))
 	col3.metric("Percentile", "{}%".format(round(max_percentile, 1)))
 
-	avg
+# Adding overall maximum
+
+st.write('## Overall')
+
+st.write('Maximum of All Time')
+
+max_o_value = total[metric].max()
+max_o_value = int(max_o_value) if metric == 'Steps' else (round(max_o_value, 1))
+max_o_idx = total[metric].idxmax()
+#print(max_idx)
+max_o_date =  total.Date.loc[max_o_idx]
+
+o_avg = total[metric].mean()
+
+o_delta = ((max_o_value - o_avg) / o_avg) * 100
+
+ocol1, ocol2 = st.columns(2)
+
+ocol1.metric("Date", max_o_date)
+ocol2.metric(metric, "{v}".format(v=max_o_value), "{p}% above average".format(p=round(o_delta,1)))
+
+
 
