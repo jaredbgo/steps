@@ -40,17 +40,19 @@ milage_df = milage_df.asfreq("D", fill_value=0).reset_index()
 
 
 #Can change this to be made from a dataframe later
-event_df = pd.DataFrame([
-	{'Date': pd.to_datetime('2019-07-20'), 'Event': 'Augustin in NYC. 100 degree weather'},
-	{'Date': pd.to_datetime('2019-07-21'),'Event': 'Augustin in NYC. 100 degree weather'},
-	{'Date': pd.to_datetime('2017-07-01'),'Event': 'London with Titouan'},
-	{'Date': pd.to_datetime('2017-07-02'),'Event': 'London with Titouan'},
-	{'Date': pd.to_datetime('2017-07-03'),'Event': 'Wimbledon'}
+# event_df = pd.DataFrame([
+# 	{'Date': pd.to_datetime('2019-07-20'), 'Event': 'Augustin in NYC. 100 degree weather'},
+# 	{'Date': pd.to_datetime('2019-07-21'),'Event': 'Augustin in NYC. 100 degree weather'},
+# 	{'Date': pd.to_datetime('2017-07-01'),'Event': 'London with Titouan'},
+# 	{'Date': pd.to_datetime('2017-07-02'),'Event': 'London with Titouan'},
+# 	{'Date': pd.to_datetime('2017-07-03'),'Event': 'Wimbledon'}
 
-])
+# ])
+# event_df = pd.read_csv('events.csv')
+# event_df['Date'] = pd.to_datetime(event_df.Date)
 
-step_df = step_df.merge(event_df, how='left', on='Date')
-milage_df = milage_df.merge(event_df, how='left', on='Date')
+# step_df = step_df.merge(event_df, how='left', on='Date')
+# milage_df = milage_df.merge(event_df, how='left', on='Date')
 
 
 

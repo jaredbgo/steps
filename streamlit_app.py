@@ -11,6 +11,12 @@ sideb.write('Explore his adventures below \n\n\n\n')
 miles = pd.read_csv('milage.csv').fillna('None')
 steps = pd.read_csv('steps.csv').fillna('None')
 
+event_df = pd.read_csv('events.csv')
+event_df['Date'] = pd.to_datetime(event_df.Date).astype(str)
+
+steps = steps.merge(event_df, how='left', on='Date')
+miles = miles.merge(event_df, how='left', on='Date')
+
 print(miles)
 
 metric = sideb.radio("Steps or miles?", ('Steps', 'Miles'))
