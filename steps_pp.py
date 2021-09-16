@@ -1,6 +1,8 @@
 import pandas as pd
 import xmltodict
 
+#https://betterprogramming.pub/analyze-your-icloud-health-data-with-pandas-dd5e963e902f
+
 input_path = './apple_health_export/export.xml'
 with open(input_path, 'r') as xml_file:
     input_data = xmltodict.parse(xml_file.read())
