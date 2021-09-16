@@ -1,12 +1,13 @@
 import pandas as pd
 import streamlit as st
+import altair as alt
 
 st.title('Jared likes to walk!')
 st.write('## Explore his adventures below\n')
 st.write('')
 
-miles = pd.read_csv('milage.csv')
-steps = pd.read_csv('steps.csv')
+miles = pd.read_csv('milage.csv').fillna('None')
+steps = pd.read_csv('steps.csv').fillna('None')
 
 print(miles)
 
@@ -26,6 +27,9 @@ else:
 if plotter.shape[0] == 0:
 	st.write('Oh no! We found no data for the supplied date range')
 else:
-	st.bar_chart(plotter.set_index('Date'))
-	print(plotter.set_index('Date'))
+	#st.bar_chart(plotter.set_index('Date'), columns= ['Miles', 'Event'])
+	#print(plotter.set_index('Date'))
 	#st.bar_chart(data=miles)
+
+	base = alt.Chart(plotter).mark_bar().encode(x='Date', y=metric, tooltip=['Date', metric, 'Event']).interactive().configure_axisX(labelAngle=-45) #labelAlign='center')
+	st.altair_chart(base, use_container_width=True)
