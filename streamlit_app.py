@@ -1,6 +1,7 @@
 import pandas as pd
 import streamlit as st
 import altair as alt
+from scipy import stats
 
 sideb = st.sidebar
 
@@ -20,8 +21,11 @@ end_date = sideb.date_input("Pick an end date")
 if metric == 'Miles':
 
 	plotter = miles[(miles.Date >= str(start_date)) & (miles.Date <= str(end_date))].copy()
+
+	total = miles.copy()
 else:
 	plotter = steps[(steps.Date >= str(start_date)) & (steps.Date <= str(end_date))].copy()
+	total = steps.copy()
 
 
 if plotter.shape[0] == 0:
@@ -38,4 +42,27 @@ else:
 
 	# Adding maxumimum
 
-	max_value = plotter[metric].max()
+	max_value = int(plotter[metric].max())
+	max_idx = plotter[metric].idxmax()
+	print(max_idx)
+	max_date =  plotter.Date.loc[max_idx]
+
+	avg = total[metric].mean()
+	delta = ((max_value - avg) / avg) * 100
+
+	compare_word = 'above' if delta > 0 else 'below'
+
+	max_percentile = stats.percentileofscore(total[metric], max_value)
+
+	plotter[metric].idxmax()
+
+	st.write('Maximum of Time Range')
+
+	col1, col2, col3 = st.columns(3)
+
+	col1.metric("Date", max_date)
+	col2.metric(metric, "{v}".format(v=max_value), "{p}% {w} average".format(p=round(delta,1), w=compare_word))
+	col3.metric("Percentile", "{}%".format(round(max_percentile, 1)))
+
+	avg
+
