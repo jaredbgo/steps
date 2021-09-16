@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import xmltodict
 
 #https://betterprogramming.pub/analyze-your-icloud-health-data-with-pandas-dd5e963e902f
@@ -16,7 +17,12 @@ raw_df = pd.DataFrame(records_list)
 step_dist_df = raw_df[raw_df['@type'].isin(['HKQuantityTypeIdentifierStepCount', 'HKQuantityTypeIdentifierDistanceWalkingRunning'])].copy()
 
 step_dist_df['value'] = step_dist_df['@value'].astype(float)
-step_dist_df['localdate'] = pd.to_datetime(step_dist_df['@creationDate'].str[:10])
+step_dist_df['localdate'] = pd.to_datetime(step_dist_df['@startDate'].str[:10])
+
+#adding anomoly correction
+
+step_dist_df['value'] = np.where((step_dist_df['@type'] == 'HKQuantityTypeIdentifierDistanceWalkingRunning') & (step_dist_df['value'] > 2.0), 2.0, step_dist_df['value'])
+step_dist_df['value'] = np.where((step_dist_df['@type'] == 'HKQuantityTypeIdentifierStepCount') & (step_dist_df['value'] > 5000.0), 5000.0, step_dist_df['value'])
 
 
 step_df = step_dist_df[step_dist_df['@type'] == 'HKQuantityTypeIdentifierStepCount'].groupby('localdate', as_index=False)['value'].sum().rename(columns={'localdate':'Date', 'value': 'Steps'})
