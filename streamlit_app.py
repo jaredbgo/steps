@@ -115,7 +115,7 @@ ocol1.metric("Date", max_o_date)
 ocol2.metric(metric, "{v}".format(v=max_o_value), "{p}% above average".format(p=round(o_delta,1)))
 
 
-o_event = total[total.Event != 'None'].groupby('Event')[metric].sum().sort_values(ascending=False)
+o_event = total[total.Event != 'None'].groupby('Event')[metric].sum().sort_values(ascending=False).head(3)
 
 
 if metric == 'Steps':
@@ -124,7 +124,7 @@ if metric == 'Steps':
 else:
 	o_event = o_event.round(1).astype(str)
 
-st.write('Event summary')
+st.write('Top 3 Events')
 
 o_event
 
