@@ -38,12 +38,14 @@ if plotter.shape[0] == 0:
 else:
 	#st.title('Daily {m} from {s} to {e}\n'.format(s=str(start_date), e=str(end_date), m=metric))
 	st.title('Daily {m} for Selected Time Range\n'.format(m=metric))
+	st.write('# ')
 	#st.bar_chart(plotter.set_index('Date'), columns= ['Miles', 'Event'])
 	#print(plotter.set_index('Date'))
 	#st.bar_chart(data=miles)
 
 	base = alt.Chart(plotter).mark_bar().encode(x='Date', y=metric, tooltip=['Date', metric, 'Event']).interactive().configure_axisX(labelAngle=-45, labelOverlap=True) #labelAlign='center')
 	st.altair_chart(base, use_container_width=True)
+	st.write('# ')
 
 
 	# Adding maxumimum
@@ -53,6 +55,7 @@ else:
 	max_idx = plotter[metric].idxmax()
 	#print(max_idx)
 	max_date =  plotter.Date.loc[max_idx]
+	max_event =  plotter.Event.loc[max_idx]
 
 	avg = total[metric].mean()
 	#delta = ((max_value - avg) / avg) * 100
@@ -66,11 +69,14 @@ else:
 
 	st.write('Maximum of Time Range')
 
-	col1, col2, col3 = st.columns(3)
+	event_display = '*' + max_event  + '*' if max_event != 'None' else '*Not an event*'
 
-	col1.metric("Date", max_date)
-	col2.metric(metric, "{v}".format(v=max_value), "{p} {w} average".format(p=round(delta,1), w=compare_word))
-	col3.metric("Percentile", "{}%".format(round(max_percentile, 1)))
+	col1, col2, col3, col4 = st.columns([1, 2, 1.4, 1])
+
+	col2.metric("Date", max_date)
+	col1.markdown(event_display)
+	col3.metric(metric, "{v}".format(v=max_value), "{p} {w} avg.".format(p=round(delta,1), w=compare_word))
+	col4.metric("Percentile", "{}%".format(round(max_percentile, 1)))
 
 	# Adding maximum event
 
@@ -81,7 +87,7 @@ else:
 		st.write('No events in selected time range')
 
 	else:
-		st.write('Event summary')
+		#st.write('Event summary')
 
 		# event = event_init.groupby('Event')[metric].sum().sort_values(ascending=False)
 
@@ -105,17 +111,25 @@ else:
 		plotly_fig = px.pie(event, values=metric, names='Event', hole = .3, hover_name='Event', hover_data={'Event': False, metric: False})
 
 		plotly_fig.update_traces(textinfo='value')
-		plotly_fig.update_layout(title="{} Walked".format(metric), 
+		plotly_fig.update_layout(
+			title= dict(text="{} Walked By Event".format(metric), 
+				font = dict(size=16)
+
+				),
+			title_x=0,
     		hoverlabel=dict(
         	font_family='arial'
     		)
 		)
+
+		st.write('# ')
 
 		st.plotly_chart(plotly_fig, use_container_width=True)
 
 # Adding overall maximum
 
 st.title('Overall')
+st.write('# ')
 
 st.write('Maximum of All Time')
 
@@ -124,16 +138,20 @@ max_o_value = int(max_o_value) if metric == 'Steps' else (round(max_o_value, 1))
 max_o_idx = total[metric].idxmax()
 #print(max_idx)
 max_o_date =  total.Date.loc[max_o_idx]
+max_o_event =  total.Event.loc[max_o_idx]
+
+o_event_display = '*' + max_o_event  + '*' if max_o_event != 'None' else '*Not an event*'
 
 o_avg = total[metric].mean()
 
 #o_delta = ((max_o_value - o_avg) / o_avg) * 100
 o_delta = max_o_value - o_avg
 
-ocol1, ocol2 = st.columns(2)
+ocol1, ocol2, ocol3 = st.columns(3)
 
-ocol1.metric("Date", max_o_date)
-ocol2.metric(metric, "{v}".format(v=max_o_value), "{p} above average".format(p=round(o_delta,1)))
+ocol1.markdown(o_event_display)
+ocol2.metric("Date", max_o_date)
+ocol3.metric(metric, "{v}".format(v=max_o_value), "{p} above avg.".format(p=round(o_delta,1)))
 
 
 o_event = total[total.Event != 'None'].groupby('Event')[metric].sum().sort_values(ascending=False).head(3)
