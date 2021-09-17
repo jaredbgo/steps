@@ -2,22 +2,21 @@ import pandas as pd
 import streamlit as st
 import altair as alt
 from scipy import stats
+import plotly.express as px
 
 sideb = st.sidebar
 
 sideb.title('Jared likes to walk!')
 sideb.write('Explore his adventures below \n\n\n\n')
 
-miles = pd.read_csv('milage.csv').fillna('None')
-steps = pd.read_csv('steps.csv').fillna('None')
+miles = pd.read_csv('milage.csv')
+steps = pd.read_csv('steps.csv')
 
 event_df = pd.read_csv('events.csv')
 event_df['Date'] = pd.to_datetime(event_df.Date).astype(str)
 
-steps = steps.merge(event_df, how='left', on='Date')
-miles = miles.merge(event_df, how='left', on='Date')
-
-print(miles)
+steps = steps.merge(event_df, how='left', on='Date').fillna('None')
+miles = miles.merge(event_df, how='left', on='Date').fillna('None')
 
 metric = sideb.radio("Steps or miles?", ('Steps', 'Miles'))
 
@@ -82,16 +81,35 @@ else:
 	else:
 		st.write('Event summary')
 
-		event = event_init.groupby('Event')[metric].sum().sort_values(ascending=False)
+		# event = event_init.groupby('Event')[metric].sum().sort_values(ascending=False)
+
+		# if metric == 'Steps':
+		# 	event = event.astype(int)
+
+		# else:
+		# 	event = event.round(1).astype(str)
+
+
+		# event
+		event = event_init.groupby('Event', as_index=False)[metric].sum()#.sort_values(ascending=False)
 
 		if metric == 'Steps':
-			event = event.astype(int)
+			event[metric] = event[metric].astype(int)
 
 		else:
-			event = event.round(1).astype(str)
+			event[metric] = event[metric].round(1).astype(str)
 
 
-		event
+		plotly_fig = px.pie(event, values=metric, names='Event', hole = .3, hover_name='Event', hover_data={'Event': False, metric: False})
+
+		plotly_fig.update_traces(textinfo='value')
+		plotly_fig.update_layout(
+    		hoverlabel=dict(
+        	font_family='arial'
+    		)
+		)
+
+		st.plotly_chart(plotly_fig, use_container_width=True)
 
 # Adding overall maximum
 
