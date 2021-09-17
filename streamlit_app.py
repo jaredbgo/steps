@@ -67,7 +67,7 @@ else:
 
 	plotter[metric].idxmax()
 
-	st.write('Maximum of Time Range')
+	st.write('Maximum for Selected Time Range')
 
 	event_display = '*' + max_event  + '*' if max_event != 'None' else '*Not an event*'
 
@@ -131,7 +131,7 @@ else:
 st.title('Overall')
 st.write('# ')
 
-st.write('Maximum of All Time')
+st.write('Maximum Overall')
 
 max_o_value = total[metric].max()
 max_o_value = int(max_o_value) if metric == 'Steps' else (round(max_o_value, 1))
@@ -154,18 +154,50 @@ ocol2.metric("Date", max_o_date)
 ocol3.metric(metric, "{v}".format(v=max_o_value), "{p} above avg.".format(p=round(o_delta,1)))
 
 
-o_event = total[total.Event != 'None'].groupby('Event')[metric].sum().sort_values(ascending=False).head(3)
+# o_event = total[total.Event != 'None'].groupby('Event')[metric].sum().sort_values(ascending=False).head(3)
+
+
+# if metric == 'Steps':
+# 	o_event = o_event.astype(int)
+
+# else:
+# 	o_event = o_event.round(1).astype(str)
+
+# st.write('Top 3 Events')
+
+# o_event
+days = total[total.Event != "None"].sort_values(by=metric, ascending=False).head(15).reset_index(drop=True).copy()
+days['Rank'] = (days.index + 1).astype(str)
 
 
 if metric == 'Steps':
-	o_event = o_event.astype(int)
+	days[metric] = days[metric].astype(int)
 
 else:
-	o_event = o_event.round(1).astype(str)
+	days[metric] = days[metric].round(1)
 
-st.write('Top 3 Events')
+#st.write('Top 3 Events')
 
-o_event
+#days
+plotly_bar = px.bar(days[['Date', metric, 'Event', 'Rank']], x='Rank', y=metric,  category_orders={'Rank': days.Rank}, hover_data={'Date':True, 'Rank': False, metric: True}, color=metric, color_continuous_scale='geyser', hover_name='Event')
+
+plotly_bar.update_layout(coloraxis_showscale=False, 
+	title= dict(
+		text="Daily {} Walked".format(metric),
+		font = dict(size=16)),
+
+	title_x=0,
+	hoverlabel=dict(
+        	font_family='arial'
+    		),
+	hovermode="x"
+	)
+
+st.plotly_chart(plotly_bar, use_container_width=True)
+#tot_base = alt.Chart(days).mark_bar().encode(x='Rank', y=metric, tooltip=['Date', metric, 'Event']).interactive().configure_axisX(labelAngle=-45, labelOverlap=True)
+#st.altair_chart(tot_base, use_container_width=True)
+#base_tot = alt.Chart(days).mark_bar().encode(x='Date', y=metric, tooltip=['Date', metric, 'Event']).interactive().configure_axisX(labelAngle=-45, labelOverlap=True)
+#st.altair_chart(base_tot, use_container_width=True)
 
 
 
