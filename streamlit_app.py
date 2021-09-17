@@ -34,7 +34,7 @@ else:
 
 
 if plotter.shape[0] == 0:
-	st.error('Oh no! We found no data for the supplied date range')
+	st.error('Oh no! We found no data for the selected date range')
 else:
 	#st.title('Daily {m} from {s} to {e}\n'.format(s=str(start_date), e=str(end_date), m=metric))
 	st.title('Daily {m} for Selected Time Range\n'.format(m=metric))
