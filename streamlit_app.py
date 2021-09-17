@@ -36,7 +36,8 @@ else:
 if plotter.shape[0] == 0:
 	st.error('Oh no! We found no data for the supplied date range')
 else:
-	st.title('Walking from {s} to {e}\n'.format(s=str(start_date), e=str(end_date)))
+	#st.title('Daily {m} from {s} to {e}\n'.format(s=str(start_date), e=str(end_date), m=metric))
+	st.title('Daily {m} for Selected Time Range\n'.format(m=metric))
 	#st.bar_chart(plotter.set_index('Date'), columns= ['Miles', 'Event'])
 	#print(plotter.set_index('Date'))
 	#st.bar_chart(data=miles)
@@ -54,7 +55,8 @@ else:
 	max_date =  plotter.Date.loc[max_idx]
 
 	avg = total[metric].mean()
-	delta = ((max_value - avg) / avg) * 100
+	#delta = ((max_value - avg) / avg) * 100
+	delta = max_value - avg
 
 	compare_word = 'above' if delta > 0 else 'below'
 
@@ -67,7 +69,7 @@ else:
 	col1, col2, col3 = st.columns(3)
 
 	col1.metric("Date", max_date)
-	col2.metric(metric, "{v}".format(v=max_value), "{p}% {w} average".format(p=round(delta,1), w=compare_word))
+	col2.metric(metric, "{v}".format(v=max_value), "{p} {w} average".format(p=round(delta,1), w=compare_word))
 	col3.metric("Percentile", "{}%".format(round(max_percentile, 1)))
 
 	# Adding maximum event
@@ -103,7 +105,7 @@ else:
 		plotly_fig = px.pie(event, values=metric, names='Event', hole = .3, hover_name='Event', hover_data={'Event': False, metric: False})
 
 		plotly_fig.update_traces(textinfo='value')
-		plotly_fig.update_layout(
+		plotly_fig.update_layout(title="{} Walked".format(metric), 
     		hoverlabel=dict(
         	font_family='arial'
     		)
@@ -125,12 +127,13 @@ max_o_date =  total.Date.loc[max_o_idx]
 
 o_avg = total[metric].mean()
 
-o_delta = ((max_o_value - o_avg) / o_avg) * 100
+#o_delta = ((max_o_value - o_avg) / o_avg) * 100
+o_delta = max_o_value - o_avg
 
 ocol1, ocol2 = st.columns(2)
 
 ocol1.metric("Date", max_o_date)
-ocol2.metric(metric, "{v}".format(v=max_o_value), "{p}% above average".format(p=round(o_delta,1)))
+ocol2.metric(metric, "{v}".format(v=max_o_value), "{p} above average".format(p=round(o_delta,1)))
 
 
 o_event = total[total.Event != 'None'].groupby('Event')[metric].sum().sort_values(ascending=False).head(3)
