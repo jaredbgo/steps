@@ -3,6 +3,7 @@ import streamlit as st
 import altair as alt
 from scipy import stats
 import plotly.express as px
+import datetime
 
 sideb = st.sidebar
 
@@ -11,6 +12,8 @@ sideb.write('Explore his adventures below \n\n\n\n')
 
 miles = pd.read_csv('milage.csv')
 steps = pd.read_csv('steps.csv')
+last_date = pd.read_csv('steps.csv').Date.max()
+first_date = pd.read_csv('steps.csv').Date.min()
 
 event_df = pd.read_csv('events.csv')
 event_df['Date'] = pd.to_datetime(event_df.Date).astype(str)
@@ -20,8 +23,8 @@ miles = miles.merge(event_df, how='left', on='Date').fillna('None')
 
 metric = sideb.radio("Steps or miles?", ('Steps', 'Miles'))
 
-start_date = sideb.date_input("Pick a start date")
-end_date = sideb.date_input("Pick an end date")
+start_date = sideb.date_input("Pick a start date", value = datetime.datetime(2021,7,1), min_value= pd.to_datetime(first_date),max_value=pd.to_datetime(last_date))
+end_date = sideb.date_input("Pick an end date", value = pd.to_datetime(last_date), min_value= pd.to_datetime(first_date), max_value=pd.to_datetime(last_date))
 
 if metric == 'Miles':
 
