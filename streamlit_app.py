@@ -25,6 +25,20 @@ metric = sideb.radio("Steps or miles?", ('Steps', 'Miles'))
 
 start_date = sideb.date_input("Pick a start date", value = datetime.datetime(2021,7,1), min_value= pd.to_datetime(first_date),max_value=pd.to_datetime(last_date))
 end_date = sideb.date_input("Pick an end date", value = pd.to_datetime(last_date), min_value= pd.to_datetime(first_date), max_value=pd.to_datetime(last_date))
+title_clause = 'Selected Time Range'
+
+
+uniq_events = event_df.sort_values(by='Date').Event.unique().tolist()
+chosen_event = sideb.selectbox("Or pick an Event", ['None'] + uniq_events, index=0)
+
+use_event = chosen_event != 'None'
+
+if use_event:
+	event_filt = event_df[event_df.Event == chosen_event].copy()
+	start_date = event_filt.Date.min()
+	end_date = event_filt.Date.max()
+	title_clause = chosen_event
+
 
 if metric == 'Miles':
 
@@ -37,10 +51,15 @@ else:
 
 
 if plotter.shape[0] == 0:
-	st.error('Oh no! We found no data for the selected date range')
+	st.error('Oh no! We found no data')
 else:
 	#st.title('Daily {m} from {s} to {e}\n'.format(s=str(start_date), e=str(end_date), m=metric))
-	st.title('Daily {m} for Selected Time Range\n'.format(m=metric))
+	st.title('Daily {m} for {c}\n'.format(m=metric,c=title_clause))
+
+	val = plotter[metric].sum().astype(int) if metric == 'Steps' else plotter[metric].sum().round(1).astype(str)
+	st.markdown('## _{v} in Total_'.format(v=val))
+
+
 	st.write('# ')
 	#st.bar_chart(plotter.set_index('Date'), columns= ['Miles', 'Event'])
 	#print(plotter.set_index('Date'))
@@ -70,7 +89,16 @@ else:
 
 	plotter[metric].idxmax()
 
-	st.write('Maximum for Selected Time Range')
+	if not use_event: 
+		st.write('Daily Maximum for {c}'.format(c=title_clause))
+	else:
+		#st.write('Event Sum')
+		# val = plotter[metric].sum().astype(int) if metric == 'Steps' else plotter[metric].sum().round(1).astype(str)
+
+		# col,dcol = st.columns(2)
+		# col.metric('Total ' + metric, "{v}".format(v=val))
+		st.write('Daily Event Maximum')
+
 
 	event_display = '*' + max_event  + '*' if max_event != 'None' else '*Not an event*'
 
@@ -125,16 +153,18 @@ else:
     		)
 		)
 
-		st.write('# ')
 
-		st.plotly_chart(plotly_fig, use_container_width=True)
+		if not use_event:
+			st.write('# ')
+			st.plotly_chart(plotly_fig, use_container_width=True)
+
 
 # Adding overall maximum
 
 st.title('Overall')
 st.write('# ')
 
-st.write('Maximum Overall')
+st.write('Daily Maximum Overall')
 
 max_o_value = total[metric].max()
 max_o_value = int(max_o_value) if metric == 'Steps' else (round(max_o_value, 1))
