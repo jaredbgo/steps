@@ -170,7 +170,15 @@ else:
 
 		if not use_event:
 			st.write('# ')
-			st.plotly_chart(plotly_fig, use_container_width=True)
+
+			if len(event.Event.unique()) < 20:
+				st.plotly_chart(plotly_fig, use_container_width=True)
+			else:
+				st.write("{} Walked By Event".format(metric))
+				event_display = event.sort_values(by=metric, ascending=False).set_index('Event')
+				event_display
+				#st.plotly_chart(plotly_fig, use_container_width=True)
+				#event
 
 
 # Adding overall maximum
