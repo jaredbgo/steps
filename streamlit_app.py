@@ -4,6 +4,20 @@ import altair as alt
 from scipy import stats
 import plotly.express as px
 import datetime
+import numpy as np
+
+#https://stackoverflow.com/questions/5180365/python-add-comma-into-number-string
+def comma(num):
+    '''Add comma to every 3rd digit. Takes int or float and
+    returns string.'''
+    num = pd.to_numeric(num)
+    #print(type(num))
+    if type(num) == int or type(num) == np.int64:
+        return '{:,}'.format(num)
+    elif type(num) == float or type(num) == np.float64:
+        return '{:,.1f}'.format(num) # Rounds to 2 decimal places
+    else:
+    	print("Need int or float as input to function comma()!")
 
 sideb = st.sidebar
 
@@ -57,7 +71,7 @@ else:
 	st.title('Daily {m} for {c}\n'.format(m=metric,c=title_clause))
 
 	val = plotter[metric].sum().astype(int) if metric == 'Steps' else plotter[metric].sum().round(1).astype(str)
-	st.markdown('## _{v} in Total_'.format(v=val))
+	st.markdown('## _{v} in Total_'.format(v=comma(val)))
 
 
 	st.write('# ')
@@ -106,7 +120,7 @@ else:
 
 	col2.metric("Date", max_date)
 	col1.markdown(event_display)
-	col3.metric(metric, "{v}".format(v=max_value), "{p} {w} avg.".format(p=round(delta,1), w=compare_word))
+	col3.metric(metric, "{v}".format(v=comma(max_value)), "{p} {w} avg.".format(p=comma(round(delta,1)), w=compare_word))
 	col4.metric("Percentile", "{}%".format(round(max_percentile, 1)))
 
 	# Adding maximum event
@@ -184,7 +198,7 @@ ocol1, ocol2, ocol3 = st.columns(3)
 
 ocol1.markdown(o_event_display)
 ocol2.metric("Date", max_o_date)
-ocol3.metric(metric, "{v}".format(v=max_o_value), "{p} above avg.".format(p=round(o_delta,1)))
+ocol3.metric(metric, "{v}".format(v=comma(max_o_value)), "{p} above avg.".format(p=comma(round(o_delta,1))))
 
 
 # o_event = total[total.Event != 'None'].groupby('Event')[metric].sum().sort_values(ascending=False).head(3)
