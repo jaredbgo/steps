@@ -71,7 +71,7 @@ else:
 	st.title('Daily {m} for {c}\n'.format(m=metric,c=title_clause))
 
 	val = plotter[metric].sum().astype(int) if metric == 'Steps' else plotter[metric].sum().round(1).astype(str)
-	st.markdown('## _{v} in Total_'.format(v=comma(val)))
+	st.markdown('## _{v} in total_'.format(v=comma(val)))
 
 
 	st.write('# ')
